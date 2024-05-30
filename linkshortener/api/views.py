@@ -5,10 +5,13 @@ from .models import ShortLink,baselink
 from .serializers import ShortLinkSerializer
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
+# from django_ratelimit.decorators import ratelimit
+# need redis
 
 class ShortLinkCreate(APIView):
+
     def post(self, request):
-        print(request.data)
         serializer = ShortLinkSerializer(data=request.data)
         if serializer.is_valid():
             short_link = serializer.save()
@@ -16,6 +19,7 @@ class ShortLinkCreate(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ShortLinkRetrieve(APIView):
+   
     def post(self, request):
         short_url = request.data.get('short_url')
         short_link = get_object_or_404(ShortLink, short_url=short_url)
@@ -23,6 +27,10 @@ class ShortLinkRetrieve(APIView):
 
 
 class RedirectShortLink(APIView):
+
     def get(self, request, short_url):
         short_link = get_object_or_404(ShortLink, short_url=baselink+short_url)
         return HttpResponseRedirect(short_link.original_url)
+    
+def home(request):
+     return render(request, 'index.html')
